@@ -10,7 +10,7 @@ api_key='1f3bb4f6de4f4a8e9a0776acff943430'
 desired_currency = 'SAR'
 sdate = date(2021, 4, 20)   # start date
 edate = date(2021, 4, 21)   # end date
-delta = edate - sdate       # as timedelta\
+delta = edate - sdate       # as timedelta
 
 revenue_list_per_day = []
 day_list = []
@@ -39,17 +39,17 @@ ax.set_ylabel('Exchange from USD to SAR')
 ax.set_title('USD to SAR')
 ax.set_xticks(x)
 ax.set_xticklabels(day_list)
+ax.set_ylim([3,4])
 # ax.legend()
-# ax.plot(x, y)
 
 """To display price top of the bar"""
 # ax.bar_label(rects2)
 
 plt.show(block=True)
 
-
-# postgres://fwuilylv:jWza7o9Uvcph9z8zFrbUAjZd70tziMRh@/fwuilylv
-
+# //////////////////////////////////////////
+# /////////////////DATABASE/////////////////
+# //////////////////////////////////////////
 DB_HOST = 'tai.db.elephantsql.com'
 DB_NAME = "fwuilylv"
 DB_USER = "fwuilylv"
@@ -57,14 +57,17 @@ DB_PASS = "jWza7o9Uvcph9z8zFrbUAjZd70tziMRh"
 
 # Connecting to db
 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+
 # Execute statements 
 cur = conn.cursor()
 
-# cur.execute("CREATE TABLE currency_exchange(id SERIAL PRIMARY KEY, exchange NUMERIC[], exchange_date DATE[]);")
+# cur.execute("CREATE TABLE currency_exchange_sar(id SERIAL PRIMARY KEY, exchange NUMERIC, exchange_date DATE);")
 
-cur.execute("INSERT INTO currency_exchange (exchange) VALUES(%s, %s)", (revenue_list_per_day, day_list))
-# cur.execute("SELECT * FROM currency_exchange;")
-# print(cur.fetchall())
+# for i in revenue_list_per_day:
+#     for n in day_list:
+#         cur.execute("INSERT INTO currency_exchange_sar (exchange, exchange_date) VALUES(%s, %s)", (i,n))
+cur.execute("SELECT * FROM currency_exchange_sar;")
+print(cur.fetchall())
 
 conn.commit()
 
