@@ -1,6 +1,8 @@
 import requests
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import queue
 from datetime import date, timedelta, datetime
 
 import psycopg2
@@ -9,7 +11,7 @@ import psycopg2
 api_key='1f3bb4f6de4f4a8e9a0776acff943430'
 desired_currency = 'SAR'
 sdate = date(2021, 4, 20)   # start date
-edate = date(2021, 4, 21)   # end date
+edate = date(2021, 4, 23)   # end date
 delta = edate - sdate       # as timedelta
 
 revenue_list_per_day = []
@@ -45,7 +47,8 @@ ax.set_ylim([3,4])
 """To display price top of the bar"""
 # ax.bar_label(rects2)
 
-plt.show(block=True)
+"""To display the graph"""
+# plt.show(block=True)
 
 # //////////////////////////////////////////
 # /////////////////DATABASE/////////////////
@@ -61,17 +64,15 @@ conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_
 # Execute statements 
 cur = conn.cursor()
 
-# cur.execute("CREATE TABLE currency_exchange_sar(id SERIAL PRIMARY KEY, exchange NUMERIC, exchange_date DATE);")
-
-# for i in revenue_list_per_day:
-#     for n in day_list:
-#         cur.execute("INSERT INTO currency_exchange_sar (exchange, exchange_date) VALUES(%s, %s)", (i,n))
-cur.execute("SELECT * FROM currency_exchange_sar;")
-print(cur.fetchall())
+# cur.execute("CREATE TABLE sar_exchange_currency (id SERIAL PRIMARY KEY, exchange NUMERIC, exchange_date DATE);")
+# cur.execute('DELETE FROM sar_exchange_currency;')
+for revenue, date_ in zip(revenue_list_per_day, day_list):
+    cur.execute("INSERT INTO sar_exchange_currency (exchange, exchange_date) VALUES(%s, %s)", (revenue,date_))
+all_data = pd.read_sql("SELECT * FROM sar_exchange_currency;", conn)
+print(all_data)
 
 conn.commit()
 
 cur.close()
 # Closing
 conn.close()
-
